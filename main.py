@@ -1,6 +1,7 @@
 def hello():
     print("Welcome to Abyss")
-    print("Hello There!")
+    print("Hello there")
     print("General Kenobi")
+    print("Czemu commit nie działa")
 
 hello()
