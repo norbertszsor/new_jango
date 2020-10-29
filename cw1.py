@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+import random
 # zadanie 1
 tekst = "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym. Został po raz pierwszy użyty w XV w. przez nieznanego drukarza do wypełnienia tekstem próbnej książki. Pięć wieków później zaczął być używany przemyśle elektronicznym, pozostając praktycznie niezmienionym. Spopularyzował się w latach 60. XX w. wraz z publikacją arkuszy Letrasetu, zawierających fragmenty Lorem Ipsum, a ostatnio z zawierającym różne wersje Lorem Ipsum oprogramowaniem przeznaczonym do realizacji druków na komputerach osobistych, jak Aldus PageMaker"
 # zadanie 2
@@ -27,9 +27,9 @@ dane1 = imie1 + " " + nazwisko1
 dane2 = imie2 + " " + nazwisko2
 print(dane1[::-1])
 print(dane2[::-1])
-=======
-import numpy as np
-import random
+#=======#
+
+
 
 def losowe():
     randomlist = []
@@ -79,7 +79,6 @@ print(' ')
 #zad12
 for i in range(100,20,-5):
     print(numery[i], end=',')
->>>>>>> origin/master
 
 
 
