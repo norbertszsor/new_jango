@@ -1,1 +1,0 @@
-print('Sprawdzam działanie gita na pycharm')
