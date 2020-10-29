@@ -31,11 +31,6 @@ krotka2=(151102, "Parch Trela")
 krotka3=(151103, "Ignatiew Ukarinko")
 studenci = [krotka1,krotka2,krotka3]
 
-krotka1=(151101, "Rafał Szybło")
-krotka2=(151102, "Parch Trela")
-krotka3=(151103, "Ignatiew Ukarinko")
-studenci = [krotka1,krotka2,krotka3]
-
 #zad9
 
 #zad10
