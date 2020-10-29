@@ -12,7 +12,6 @@ def losowe():
 #zad6
 lista = [i for i in range(1,11)]
 lista2 = []
-
 for i in range(1,11):
     if(i>5):
         lista.pop()
