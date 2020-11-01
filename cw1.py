@@ -62,6 +62,11 @@ krotka3=(151103, "Ignatiew Ukarinko")
 studenci = [krotka1,krotka2,krotka3]
 
 #zad9
+wartosc1 = ("22","n@wp.pl","1998","pstrowskiego 12")
+wartosc2 = ("23","nor@wp.pl","1997","wolnosci 11")
+wartosc3 = ("24","norbe@wp.pl","1996","generalow 10")
+
+slownik = {krotka1:wartosc1,krotka2:wartosc2,krotka3:wartosc3}
 
 #zad10
 
@@ -81,4 +86,12 @@ for i in range(100,20,-5):
     print(numery[i], end=',')
 
 
+#zad13
+slownik1 = {"Rekord1", "Rekord2", "Rekord3"}
+slownik2 = {"Kolor1", "Kolor2", "Kolor3"}
+slownik3 = {"Moc1", "Moc2", "Moc3"}
+lista_slownikow = [slownik1,slownik2,slownik3]
 
+
+print(" ")
+print(lista_slownikow)
