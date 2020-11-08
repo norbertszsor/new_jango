@@ -1,4 +1,5 @@
 import file_manager
+import chuck_norris
 
 
 #zad5
@@ -48,6 +49,10 @@ print(reverse("Norbert"))
 plik1 = file_manager.FileManager("test")
 plik1.update_file("testowy tekst"+"\n")
 print(plik1.read_file())
+
+#zad10
+obiekt1 = chuck_norris.norris("patryk")
+obiekt1.wypisz();
 
 
 
