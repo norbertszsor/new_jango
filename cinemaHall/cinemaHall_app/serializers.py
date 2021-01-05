@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id_user', 'user_name', 'password', 'email', 'age']
 
-class TicketOprionsSerializer(serializers.ModelSerializer):
+class TicketOptionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket_options
         fields = ['id_ticket', 'name_ticket', 'price', 'number_of_seats', 'age']
