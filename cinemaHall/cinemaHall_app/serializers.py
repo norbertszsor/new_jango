@@ -24,7 +24,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class TranslationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Transalation
+        model = Translation
         fields = ['id_translation', 'name_translation']
 
 class CinemaHallSerializer(serializers.ModelSerializer):
@@ -52,6 +52,12 @@ class FilmShowsSerializer(serializers.ModelSerializer):
         fields = ['id_film_shows', 'id_film', 'id_CinemaHall', 'id_Translation', 'date']
 
 class GiveMeSeatSerializer(serializers.ModelSerializer):
+    id_seat = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='id_seat'
+    )
+
     class Meta:
         model = Give_me_seat
         fields = ['id_give_me_seat', 'id_seat', 'id_ticket_options', 'id_user']

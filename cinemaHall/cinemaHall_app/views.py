@@ -1,10 +1,9 @@
 from django.http import Http404, HttpResponse
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import *
 from .serializers import *
 
 
@@ -12,14 +11,8 @@ def homePage(request):
     return HttpResponse('HomePage')
 
 # ------------------------------USER
-class UserList(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
+class UserList(APIView):
 
     def get(self, request, format=None):
         modele = User.objects.all()
@@ -65,6 +58,38 @@ class UserDetail(APIView):
         modele = self.get_object(pk)
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
 
 # ------------------------------TICKET_OPTIONS
 class TicketOptionsList(APIView):
@@ -121,6 +146,38 @@ class TicketOptionsDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class TicketOptionsCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Ticket_options.objects.all()
+    serializer_class = TicketOptionsSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Pegi
 class PegiList(APIView):
     permission_classes = [IsAuthenticated]
@@ -175,6 +232,39 @@ class PegiDetail(APIView):
         modele = self.get_object(pk)
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class PegiCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Pegi.objects.all()
+    serializer_class = PegiSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 
 # ------------------------------Category
 class CategoryList(APIView):
@@ -231,6 +321,38 @@ class CategoryDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class CategoryCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Translation
 class TranslationList(APIView):
     permission_classes = [IsAuthenticated]
@@ -242,7 +364,7 @@ class TranslationList(APIView):
         return Response(content)
 
     def get(self, request, format=None):
-        modele = Transalation.objects.all()
+        modele = Translation.objects.all()
         serializer_class = TranslationSerializer(modele, many=True)
         return Response(serializer_class.data)
 
@@ -264,8 +386,8 @@ class TranslationDetail(APIView):
 
     def get_object(self, pk):
         try:
-            return Transalation.objects.get(pk=pk)
-        except Transalation.DoesNotExist:
+            return Translation.objects.get(pk=pk)
+        except Translation.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
@@ -285,6 +407,38 @@ class TranslationDetail(APIView):
         modele = self.get_object(pk)
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class TranslationCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Translation.objects.all()
+    serializer_class = TranslationSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
 
 # ------------------------------Cinema_hall
 class CinemaHallList(APIView):
@@ -341,6 +495,38 @@ class CinemaHallLDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class CinemaHallCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Cinema_hall.objects.all()
+    serializer_class = CinemaHallSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Film
 class FilmList(APIView):
     permission_classes = [IsAuthenticated]
@@ -396,8 +582,40 @@ class FilmDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class FilmCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Film.objects.all()
+    serializer_class = FilmSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Seats
-class SeatList(APIView):
+class SeatsList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -418,7 +636,7 @@ class SeatList(APIView):
             return Response(serializer_class.data, status=status.HTTP_201_CREATED)
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SeatDetail(APIView):
+class SeatsDetail(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request, format=None):
@@ -451,9 +669,40 @@ class SeatDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class SeatsCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Seats.objects.all()
+    serializer_class = SeatsSerializer
+    lookup_field = 'pk'
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Film_shows
 class FilmShowsList(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         content = {
@@ -474,7 +723,6 @@ class FilmShowsList(APIView):
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FilmShowsDetail(APIView):
-    permission_classes = [IsAdminUser]
 
     def get(self, request, format=None):
         content = {
@@ -506,9 +754,39 @@ class FilmShowsDetail(APIView):
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class FilmShowsCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    queryset = Film_shows.objects.all()
+    serializer_class = FilmShowsSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)
+
 # ------------------------------Give_me_seat
 class GiveMeSeatList(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         content = {
@@ -529,7 +807,7 @@ class GiveMeSeatList(APIView):
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class GiveMeSeatDetail(APIView):
-    permission_classes = [IsAdminUser]
+
 
     def get(self, request, format=None):
         content = {
@@ -560,3 +838,35 @@ class GiveMeSeatDetail(APIView):
         modele = self.get_object(pk)
         modele.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GiveMeSeatCreate(generics.ListCreateAPIView,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin):
+    permission_classes = [IsAdminUser]
+    queryset = Give_me_seat.objects.all()
+    serializer_class = GiveMeSeatSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, pk=None):
+        if pk:
+            return self.retrieve(request, pk)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def put(self, request, pk = None):
+        return self.update(request, pk)
+
+    def perform_update(self, serializer):
+        serializer.save(created_by = self.request.user)
+
+    def delete(self, request, pk = None):
+        return self.destroy(request, pk)

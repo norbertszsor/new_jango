@@ -21,7 +21,7 @@ class Category(models.Model):
     id_category = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45)
 
-class Transalation(models.Model):
+class Translation(models.Model):
     id_translation = models.AutoField(primary_key=True)
     name_translation = models.CharField(max_length=45)
 
@@ -47,7 +47,7 @@ class Film_shows(models.Model):
     id_film_shows = models.AutoField(primary_key=True)
     id_film = models.ForeignKey(Film, on_delete=models.CASCADE)
     id_CinemaHall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE)
-    id_Translation = models.ForeignKey(Transalation, on_delete=models.CASCADE)
+    id_Translation = models.ForeignKey(Translation, on_delete=models.CASCADE)
     date = models.DateTimeField()
 
 class Give_me_seat(models.Model):
