@@ -7,6 +7,7 @@ class User(models.Model):
     email = models.CharField(max_length=45)
     age = models.IntegerField(null=False)
 
+
 class Ticket_options(models.Model):
     id_ticket = models.AutoField(primary_key=True)
     name_ticket = models.CharField(max_length=45)
@@ -16,6 +17,10 @@ class Ticket_options(models.Model):
 class Pegi(models.Model):
     id_pegi = models.AutoField(primary_key = True)
     age_range = models.IntegerField()
+
+    def __str__(self):
+        return self.id_pegi
+
 
 class Category(models.Model):
     id_category = models.AutoField(primary_key=True)
