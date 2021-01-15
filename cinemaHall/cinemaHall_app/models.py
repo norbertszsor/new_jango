@@ -16,7 +16,7 @@ class User(BaseModel):
     age = models.IntegerField(null=False)
 
     def __str__(self):
-        return self.id_user
+        return str(self.id_user)
 
 
 class Ticket_options(BaseModel):
@@ -26,7 +26,7 @@ class Ticket_options(BaseModel):
     number_of_seats = models.IntegerField()
 
     def __str__(self):
-        return self.id_ticket
+        return str(self.id_ticket)
 
 
 class Pegi(BaseModel):
@@ -34,7 +34,7 @@ class Pegi(BaseModel):
     age_range = models.IntegerField()
 
     def __str__(self):
-        return self.id_pegi
+        return str(self.id_pegi)
 
 
 class Category(BaseModel):
@@ -42,15 +42,15 @@ class Category(BaseModel):
     name = models.CharField(max_length=45)
 
     def __str__(self):
-        return self.id_category
+        return str(self.id_category)
 
 
-class Translation(BaseModel):
+class Transalation(BaseModel):
     id_translation = models.AutoField(primary_key=True)
     name_translation = models.CharField(max_length=45)
 
     def __str__(self):
-        return self.id_translation
+        return str(self.id_translation)
 
 
 class Cinema_hall(BaseModel):
@@ -59,7 +59,7 @@ class Cinema_hall(BaseModel):
     use_3d = models.SmallIntegerField()
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Film(BaseModel):
@@ -69,7 +69,7 @@ class Film(BaseModel):
     title = models.CharField(max_length=45)
 
     def __str__(self):
-        return self.id_film
+        return str(self.id_film)
 
 
 class Seats(BaseModel):
@@ -80,18 +80,18 @@ class Seats(BaseModel):
     its_fill = models.SmallIntegerField()
 
     def __str__(self):
-        return self.id_seat
+        return str(self.id_seat)
 
 
 class Film_shows(BaseModel):
     id_film_shows = models.AutoField(primary_key=True)
     id_film = models.ForeignKey(Film, on_delete=models.CASCADE)
     id_CinemaHall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE)
-    id_Translation = models.ForeignKey(Translation, on_delete=models.CASCADE)
+    id_Translation = models.ForeignKey(Transalation, on_delete=models.CASCADE)
     date = models.DateTimeField()
 
     def __str__(self):
-        return self.id_film_shows
+        return str(self.id_film_shows)
 
 
 class Give_me_seat(BaseModel):

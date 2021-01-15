@@ -43,8 +43,8 @@ class PegiList(generics.ListCreateAPIView):
 
 
 class PegiDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = Pegi.objects.all()
+    serializer_class = PegiSerializer
     name = 'pegi-detail'
 
 
@@ -60,15 +60,15 @@ class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     name = 'category-detail'
 
 
-class TranslationList(generics.ListCreateAPIView):
-    queryset = Translation.objects.all()
-    serializer_class = TranslationSerializer
-    name = 'translation-list'
+class TransalationList(generics.ListCreateAPIView):
+    queryset = Transalation.objects.all()
+    serializer_class = TransalationSerializer
+    name = 'transalation-list'
 
 
-class TranslationDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Translation.objects.all()
-    serializer_class = TranslationSerializer
+class TransalationDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Transalation.objects.all()
+    serializer_class = TransalationSerializer
     name = 'translation-detail'
 
 
