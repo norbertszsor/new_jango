@@ -4,6 +4,8 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
+import django_filters.rest_framework
 from .serializers import *
 from .models import *
 
@@ -16,6 +18,9 @@ class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     name = 'user-list'
+    filter_fields = ['user_name', 'email', 'age']
+    search_fields = ['id_user', 'user_name']
+    ordering_fields = ['id_user', 'user_name','email', 'age', 'active_reservations']
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
