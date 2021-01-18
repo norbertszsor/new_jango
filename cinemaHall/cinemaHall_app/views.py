@@ -20,7 +20,7 @@ class UserList(generics.ListCreateAPIView):
     name = 'user-list'
     filter_fields = ['user_name', 'email', 'age']
     search_fields = ['id_user', 'user_name']
-    ordering_fields = ['id_user', 'user_name','email', 'age', 'active_reservations']
+    ordering_fields = ['id_user', 'user_name','email', 'age']
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
