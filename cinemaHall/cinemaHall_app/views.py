@@ -6,12 +6,28 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
 import django_filters.rest_framework
+from rest_framework.reverse import reverse
 from .serializers import *
 from .models import *
 
 
-def homepage(request):
-    return HttpResponse('HomePage')
+class AdminMenu(generics.GenericAPIView):
+    name = 'Admin-Menu'
+
+    def get(self, request):
+        return Response({
+            'User': reverse(UserList.name, request=request),
+            'Tickets': reverse(TicketList.name, request=request),
+            'Pegi': reverse(PegiList.name, request=request),
+            'Category': reverse(CategoryList.name, request=request),
+            'Translation': reverse(TransalationList.name, request=request),
+            'CinemaHall': reverse(CinemaHallList.name, request=request),
+            'Film': reverse(FilmList.name, request=request),
+            'Seats': reverse(SeatsList.name, request=request),
+            'FilmShows': reverse(FilmShowsList.name, request=request),
+            'Reservation': reverse(GiveMeSeatList.name, request=request),
+
+        })
 
 
 class UserList(generics.ListCreateAPIView):
@@ -20,7 +36,7 @@ class UserList(generics.ListCreateAPIView):
     name = 'user-list'
     filter_fields = ['user_name', 'email', 'age']
     search_fields = ['id_user', 'user_name']
-    ordering_fields = ['id_user', 'user_name','email', 'age']
+    ordering_fields = ['id_user', 'user_name', 'email', 'age']
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):

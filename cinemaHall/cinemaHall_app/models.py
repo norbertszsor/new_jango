@@ -64,8 +64,8 @@ class Cinema_hall(BaseModel):
 
 class Film(BaseModel):
     id_film = models.AutoField(primary_key=True)
-    id_category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    id_pegi = models.ForeignKey(Pegi, on_delete=models.CASCADE)
+    id_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='films')
+    id_pegi = models.ForeignKey(Pegi, on_delete=models.CASCADE, related_name='films')
     title = models.CharField(max_length=45)
 
     def __str__(self):
@@ -74,7 +74,7 @@ class Film(BaseModel):
 
 class Seats(BaseModel):
     id_seat = models.AutoField(primary_key=True)
-    id_cinema_hall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE)
+    id_cinema_hall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE, related_name='seats')
     x = models.IntegerField()
     y = models.IntegerField()
     its_fill = models.SmallIntegerField()
@@ -85,9 +85,9 @@ class Seats(BaseModel):
 
 class Film_shows(BaseModel):
     id_film_shows = models.AutoField(primary_key=True)
-    id_film = models.ForeignKey(Film, on_delete=models.CASCADE)
-    id_CinemaHall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE)
-    id_Translation = models.ForeignKey(Transalation, on_delete=models.CASCADE)
+    id_film = models.ForeignKey(Film, on_delete=models.CASCADE, related_name='filmshows')
+    id_CinemaHall = models.ForeignKey(Cinema_hall, on_delete=models.CASCADE, related_name='filmshows')
+    id_Translation = models.ForeignKey(Transalation, on_delete=models.CASCADE, related_name='filmshows')
     date = models.DateTimeField()
 
     def __str__(self):
@@ -96,9 +96,9 @@ class Film_shows(BaseModel):
 
 class Give_me_seat(BaseModel):
     id_give_me_seat = models.AutoField(primary_key=True)
-    id_seat = models.ForeignKey(Seats, on_delete=models.CASCADE)
-    id_ticket_options = models.ForeignKey(Ticket_options, on_delete=models.CASCADE)
-    id_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_seat = models.ForeignKey(Seats, on_delete=models.CASCADE, related_name='reservation')
+    id_ticket_options = models.ForeignKey(Ticket_options, on_delete=models.CASCADE, related_name='reservation')
+    id_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservation')
 
     def __str__(self):
         return self.id_give_me_seat

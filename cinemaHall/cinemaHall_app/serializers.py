@@ -1,28 +1,27 @@
 from rest_framework import serializers
 from .models import *
-from datetime import datetime
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    active_reservations = serializers.HyperlinkedRelatedField(source='Give_me_seat_set.all', read_only=True,
-                                                              view_name='reservation-detail')
+    reservation = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                      view_name='reservation-detail')
 
     class Meta:
         model = User
-        fields = ['id_user', 'user_name', 'password', 'email', 'age', 'active_reservations']
+        fields = ['id_user', 'user_name', 'password', 'email', 'age', 'reservation']
 
 
 class TicketOptionsSerializer(serializers.HyperlinkedModelSerializer):
-    reservations = serializers.HyperlinkedRelatedField(source='Give_me_seat_set.all', read_only=True,
-                                                       view_name='reservation-detail')
+    reservation = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                      view_name='reservation-detail')
 
     class Meta:
         model = Ticket_options
-        fields = ['id_ticket', 'name_ticket', 'price', 'number_of_seats', 'reservations']
+        fields = ['id_ticket', 'name_ticket', 'price', 'number_of_seats', 'reservation']
 
 
 class PegiSerializer(serializers.HyperlinkedModelSerializer):
-    films = serializers.HyperlinkedRelatedField(source='Film_set.all', read_only=True, view_name='film-detail')
+    films = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='film-detail')
 
     class Meta:
         model = Pegi
@@ -30,7 +29,7 @@ class PegiSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
-    films = serializers.HyperlinkedRelatedField(source='Film_set.all', read_only=True, view_name='film-detail')
+    films = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='film-detail')
 
     class Meta:
         model = Category
@@ -38,7 +37,7 @@ class CategorySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TransalationSerializer(serializers.HyperlinkedModelSerializer):
-    filmshows = serializers.HyperlinkedRelatedField(source='Film_shows_set.all', read_only=True,
+    filmshows = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                     view_name='filmshows-detail')
 
     class Meta:
@@ -47,10 +46,10 @@ class TransalationSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CinemaHallSerializer(serializers.HyperlinkedModelSerializer):
-    filmshows = serializers.HyperlinkedRelatedField(source='Film_shows_set.all', read_only=True,
+    filmshows = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                     view_name='filmshows-detail')
-    seats = serializers.HyperlinkedRelatedField(source='Seats_set.all', read_only=True,
-                                                view_name='filmshows-detail')
+    seats = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                view_name='seats-detail')
 
     class Meta:
         model = Cinema_hall
@@ -60,7 +59,7 @@ class CinemaHallSerializer(serializers.HyperlinkedModelSerializer):
 class FilmSerializer(serializers.HyperlinkedModelSerializer):
     id_category = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field='name')
     id_pegi = serializers.SlugRelatedField(queryset=Pegi.objects.all(), slug_field='age_range')
-    filmshows = serializers.HyperlinkedRelatedField(source='Film_shows_set.all', read_only=True,
+    filmshows = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                     view_name='filmshows-detail')
 
     class Meta:
@@ -70,12 +69,12 @@ class FilmSerializer(serializers.HyperlinkedModelSerializer):
 
 class SeatsSerializer(serializers.HyperlinkedModelSerializer):
     id_cinema_hall = serializers.SlugRelatedField(queryset=Cinema_hall.objects.all(), slug_field='size')
-    reservations = serializers.HyperlinkedRelatedField(source='Give_me_seat_set.all', read_only=True,
-                                                       view_name='reservation-detail')
+    reservation = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                      view_name='reservation-detail')
 
     class Meta:
         model = Seats
-        fields = ['id_seat', 'id_cinema_hall', 'x', 'y', 'its_fill', 'reservations']
+        fields = ['id_seat', 'id_cinema_hall', 'x', 'y', 'its_fill', 'reservation']
 
 
 class FilmShowsSerializer(serializers.HyperlinkedModelSerializer):
