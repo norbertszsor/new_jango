@@ -1,3 +1,4 @@
+from django_filters import NumberFilter
 from rest_framework import serializers
 from .models import *
 
