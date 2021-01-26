@@ -16,7 +16,7 @@ class AdminMenu(generics.GenericAPIView):
 
     def get(self, request):
         return Response({
-            'User': reverse(UserList.name, request=request),
+            'UserCinema': reverse(UserCinemaList.name, request=request),
             'Tickets': reverse(TicketList.name, request=request),
             'Pegi': reverse(PegiList.name, request=request),
             'Category': reverse(CategoryList.name, request=request),
@@ -30,20 +30,23 @@ class AdminMenu(generics.GenericAPIView):
         })
 
 
-class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-list'
+class UserCinemaList(generics.ListCreateAPIView):
+    queryset = UserCinema.objects.all()
+    serializer_class = UserCinemaSerializer
+    name = 'usercinema-list'
     filter_fields = ['user_name', 'email', 'age']
     search_fields = ['user_name']
     ordering_fields = ['id_user', 'user_name', 'age']
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(ownerUser=self.request.user)
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-detail'
+
+class UserCinemaDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserCinema.objects.all()
+    serializer_class = UserCinemaSerializer
+    name = 'usercinema-detail'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
@@ -93,6 +96,9 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     name = 'category-list'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(ownerCategory=self.request.user)
 
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):

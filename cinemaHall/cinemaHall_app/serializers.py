@@ -1,15 +1,16 @@
-from django_filters import NumberFilter
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserCinemaSerializer(serializers.HyperlinkedModelSerializer):
+    ownerUser = serializers.ReadOnlyField(source='ownerUser.username')
     reservation = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                       view_name='reservation-detail')
 
     class Meta:
-        model = User
-        fields = ['id_user', 'user_name', 'password', 'email', 'age', 'reservation']
+        model = UserCinema
+        fields = ['id_user', 'user_name', 'password', 'email', 'age', 'reservation', 'ownerUser']
 
 
 class TicketOptionsSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,10 +32,11 @@ class PegiSerializer(serializers.HyperlinkedModelSerializer):
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     films = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='film-detail')
+    ownerCategory = serializers.ReadOnlyField(source='ownerCategory.username')
 
     class Meta:
         model = Category
-        fields = ['id_category', 'name', 'films']
+        fields = ['id_category', 'name', 'films', 'ownerCategory']
 
 
 class TransalationSerializer(serializers.HyperlinkedModelSerializer):
@@ -91,9 +93,25 @@ class FilmShowsSerializer(serializers.HyperlinkedModelSerializer):
 
 class GiveMeSeatSerializer(serializers.HyperlinkedModelSerializer):
     id_seat = serializers.SlugRelatedField(queryset=Seats.objects.all(), slug_field='its_fill')
-    id_user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='user_name')
+    id_user = serializers.SlugRelatedField(queryset=UserCinema.objects.all(), slug_field='user_name')
     id_ticket_options = serializers.SlugRelatedField(queryset=Ticket_options.objects.all(), slug_field='name_ticket')
 
     class Meta:
         model = Give_me_seat
         fields = ['id_give_me_seat', 'id_seat', 'id_ticket_options', 'id_user']
+
+
+class UserCategorySerializer(serializers.HyperlinkedModelSerializer):
+    UserCategory = CategorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['url', 'pk', 'username', 'UserCategory']
+
+
+class UserOwnerCinemaSerializer(serializers.HyperlinkedModelSerializer):
+    UserCinema = UserCinemaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['url', 'pk', 'username', 'UserCinema']

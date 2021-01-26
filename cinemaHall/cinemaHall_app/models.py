@@ -8,12 +8,13 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class User(BaseModel):
+class UserCinema(BaseModel):
     id_user = models.AutoField(primary_key=True)
     user_name = models.CharField(max_length=25)
     password = models.CharField(max_length=25)
     email = models.CharField(max_length=45)
     age = models.IntegerField(null=False)
+    ownerUser = models.ForeignKey('auth.User', related_name='UserCinema', on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return str(self.id_user)
@@ -40,9 +41,11 @@ class Pegi(BaseModel):
 class Category(BaseModel):
     id_category = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45)
+    ownerCategory = models.ForeignKey('auth.User', related_name='UserCategory', on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return str(self.id_category)
+
 
 
 class Transalation(BaseModel):
@@ -98,7 +101,7 @@ class Give_me_seat(BaseModel):
     id_give_me_seat = models.AutoField(primary_key=True)
     id_seat = models.ForeignKey(Seats, on_delete=models.CASCADE, related_name='reservation')
     id_ticket_options = models.ForeignKey(Ticket_options, on_delete=models.CASCADE, related_name='reservation')
-    id_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservation')
+    id_user = models.ForeignKey(UserCinema, on_delete=models.CASCADE, related_name='reservation')
 
     def __str__(self):
         return self.id_give_me_seat
