@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'cinemaHall_app',
     'rest_framework',
     'django_filters',
-
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [

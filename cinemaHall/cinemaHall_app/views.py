@@ -34,7 +34,7 @@ class UserCinemaList(generics.ListCreateAPIView):
     queryset = UserCinema.objects.all()
     serializer_class = UserCinemaSerializer
     name = 'usercinema-list'
-    filter_fields = ['user_name', 'email', 'age']
+    filterset_fields = ['user_name', 'email', 'age']
     search_fields = ['user_name']
     ordering_fields = ['id_user', 'user_name', 'age']
     permission_classes = [permissions.IsAdminUser]
@@ -54,8 +54,8 @@ class TicketList(generics.ListCreateAPIView):
     queryset = Ticket_options.objects.all()
     serializer_class = TicketOptionsSerializer
     name = 'ticket-list'
-    filter_fields = ['name_ticket', 'reservation']
-    search_fields = ['name_ticket', 'id_ticket']
+    filterset_fields = ['name_ticket', 'reservation']
+    search_fields = ['name_ticket']
     ordering_fields = ['name_ticket', 'price', 'reservation']
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -75,22 +75,20 @@ class PegiListFilter(FilterSet):
         model = Pegi
         fields = ['minAge', 'maxAge']
 
-
-
 class PegiList(generics.ListCreateAPIView):
     queryset = Pegi.objects.all()
     serializer_class = PegiSerializer
     name = 'pegi-list'
     filter_class = PegiListFilter
+    ordering_fields = ['age_range']
+    search_fields = ['age_range']
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
 
 class PegiDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Pegi.objects.all()
     serializer_class = PegiSerializer
     name = 'pegi-detail'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
@@ -100,7 +98,6 @@ class CategoryList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(ownerCategory=self.request.user)
-
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
@@ -113,6 +110,9 @@ class TransalationList(generics.ListCreateAPIView):
     queryset = Transalation.objects.all()
     serializer_class = TransalationSerializer
     name = 'transalation-list'
+    filterset_fields = ['name_translation']
+    ordering_fields = ['name_translation']
+    search_fields = ['name_translation']
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
@@ -141,7 +141,7 @@ class FilmList(generics.ListCreateAPIView):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
     name = 'film-list'
-    filter_fields = ['id_film', 'id_category', 'id_pegi']
+    filterset_fields = ['id_film', 'id_category', 'id_pegi']
     search_fields = ['title']
     ordering_fields = ['id_film']
     permission_classes = [permissions.IsAuthenticated]

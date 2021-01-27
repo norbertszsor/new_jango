@@ -7,7 +7,6 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-
 class UserCinema(BaseModel):
     id_user = models.AutoField(primary_key=True)
     user_name = models.CharField(max_length=25)
@@ -19,7 +18,6 @@ class UserCinema(BaseModel):
     def __str__(self):
         return str(self.id_user)
 
-
 class Ticket_options(BaseModel):
     id_ticket = models.AutoField(primary_key=True)
     name_ticket = models.CharField(max_length=45)
@@ -29,14 +27,12 @@ class Ticket_options(BaseModel):
     def __str__(self):
         return str(self.id_ticket)
 
-
 class Pegi(BaseModel):
     id_pegi = models.AutoField(primary_key=True)
     age_range = models.IntegerField()
 
     def __str__(self):
         return str(self.id_pegi)
-
 
 class Category(BaseModel):
     id_category = models.AutoField(primary_key=True)
@@ -46,15 +42,12 @@ class Category(BaseModel):
     def __str__(self):
         return str(self.id_category)
 
-
-
 class Transalation(BaseModel):
     id_translation = models.AutoField(primary_key=True)
     name_translation = models.CharField(max_length=45)
 
     def __str__(self):
         return str(self.id_translation)
-
 
 class Cinema_hall(BaseModel):
     id = models.AutoField(primary_key=True)
@@ -64,7 +57,6 @@ class Cinema_hall(BaseModel):
     def __str__(self):
         return str(self.id)
 
-
 class Film(BaseModel):
     id_film = models.AutoField(primary_key=True)
     id_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='films')
@@ -73,7 +65,6 @@ class Film(BaseModel):
 
     def __str__(self):
         return str(self.id_film)
-
 
 class Seats(BaseModel):
     id_seat = models.AutoField(primary_key=True)
@@ -85,7 +76,6 @@ class Seats(BaseModel):
     def __str__(self):
         return str(self.id_seat)
 
-
 class Film_shows(BaseModel):
     id_film_shows = models.AutoField(primary_key=True)
     id_film = models.ForeignKey(Film, on_delete=models.CASCADE, related_name='filmshows')
@@ -95,7 +85,6 @@ class Film_shows(BaseModel):
 
     def __str__(self):
         return str(self.id_film_shows)
-
 
 class Give_me_seat(BaseModel):
     id_give_me_seat = models.AutoField(primary_key=True)

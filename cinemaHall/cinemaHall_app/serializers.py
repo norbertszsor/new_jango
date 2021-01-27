@@ -19,7 +19,7 @@ class TicketOptionsSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Ticket_options
-        fields = ['id_ticket', 'name_ticket', 'price', 'number_of_seats', 'reservation']
+        fields = ['pk', 'id_ticket', 'name_ticket', 'price', 'number_of_seats', 'reservation']
 
 
 class PegiSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,7 +45,7 @@ class TransalationSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Transalation
-        fields = ['id_translation', 'name_translation', 'filmshows']
+        fields = ['pk', 'id_translation', 'name_translation', 'filmshows']
 
 
 class CinemaHallSerializer(serializers.HyperlinkedModelSerializer):

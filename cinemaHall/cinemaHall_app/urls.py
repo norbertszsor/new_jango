@@ -34,6 +34,4 @@ urlpatterns = [
 
     path('reservation-list', views.GiveMeSeatList.as_view(), name=views.GiveMeSeatList.name),
     path('reservation-detail/<int:pk>', views.GiveMeSeatDetail.as_view(), name=views.GiveMeSeatDetail.name),
-
-
 ]
