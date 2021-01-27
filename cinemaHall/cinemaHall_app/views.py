@@ -1,823 +1,210 @@
 from django.http import Http404, HttpResponse
 from rest_framework.response import Response
-from rest_framework import generics, mixins
-from django.shortcuts import render
+from rest_framework import generics, permissions
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
+import django_filters.rest_framework
+from rest_framework.reverse import reverse
 from .serializers import *
-from .filters import *
+from .models import *
 
-def homePage(request):
-    return HttpResponse('HomePage')
 
-# ------------------------------USER
+class AdminMenu(generics.GenericAPIView):
+    name = 'Admin-Menu'
 
-def product_list(request):
-    f = UserFilter(request.GET, queryset=User.objects.all())
-    return render(request, 'templates/form.html', {'filter': f})
+    def get(self, request):
+        return Response({
+            'UserCinema': reverse(UserCinemaList.name, request=request),
+            'Tickets': reverse(TicketList.name, request=request),
+            'Pegi': reverse(PegiList.name, request=request),
+            'Category': reverse(CategoryList.name, request=request),
+            'Translation': reverse(TransalationList.name, request=request),
+            'CinemaHall': reverse(CinemaHallList.name, request=request),
+            'Film': reverse(FilmList.name, request=request),
+            'Seats': reverse(SeatsList.name, request=request),
+            'FilmShows': reverse(FilmShowsList.name, request=request),
+            'Reservation': reverse(GiveMeSeatList.name, request=request),
 
-class UserList(APIView):
+        })
 
-    def get(self, request, format=None):
-        modele = User.objects.all()
-        serializer_class = UserSerializer(modele, many=True)
-        return Response(serializer_class.data)
 
-    def post(self, request, format=None):
-        serializer_class = UserSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['filter'] = UserFilter(self.request.GET, querysetset = self.get_queryset())
-
-class UserDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = UserSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = UserSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class UserCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'pk'
-    filter_fields = ['user_name', 'password']
+class UserCinemaList(generics.ListCreateAPIView):
+    queryset = UserCinema.objects.all()
+    serializer_class = UserCinemaSerializer
+    name = 'usercinema-list'
+    filter_fields = ['user_name', 'email', 'age']
     search_fields = ['user_name']
-    ordering_fields = ['user_name']
+    ordering_fields = ['id_user', 'user_name', 'age']
+    permission_classes = [permissions.IsAdminUser]
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+    def perform_create(self, serializer):
+        serializer.save(ownerUser=self.request.user)
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
+class UserCinemaDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserCinema.objects.all()
+    serializer_class = UserCinemaSerializer
+    name = 'usercinema-detail'
+    permission_classes = [permissions.IsAdminUser]
 
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
 
-# ------------------------------TICKET_OPTIONS
-class TicketOptionsList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Ticket_options.objects.all()
-        serializer_class = TicketOptionsSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = TicketOptionsSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class TicketOptionsDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Ticket_options.objects.get(pk=pk)
-        except Ticket_options.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = TicketOptionsSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = TicketOptionsSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class TicketOptionsCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class TicketList(generics.ListCreateAPIView):
     queryset = Ticket_options.objects.all()
     serializer_class = TicketOptionsSerializer
-    lookup_field = 'pk'
+    name = 'ticket-list'
+    filter_fields = ['name_ticket', 'reservation']
+    search_fields = ['name_ticket', 'id_ticket']
+    ordering_fields = ['name_ticket', 'price', 'reservation']
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Ticket_options.objects.all()
+    serializer_class = TicketOptionsSerializer
+    name = 'ticket-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
+class PegiListFilter(FilterSet):
+    minAge = NumberFilter(field_name='age_range', lookup_expr='gte')
+    maxAge = NumberFilter(field_name='age_range', lookup_expr='lte')
 
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
+    class meta:
+        model = Pegi
+        fields = ['minAge', 'maxAge']
 
-# ------------------------------Pegi
-class PegiList(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
 
-    def get(self, request, format=None):
-        modele = Pegi.objects.all()
-        serializer_class = PegiSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = PegiSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PegiDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Pegi.objects.get(pk=pk)
-        except Pegi.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = PegiSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = PegiSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class PegiCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class PegiList(generics.ListCreateAPIView):
     queryset = Pegi.objects.all()
     serializer_class = PegiSerializer
-    lookup_field = 'pk'
+    name = 'pegi-list'
+    filter_class = PegiListFilter
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
-
-    def post(self, request):
-        return self.create(request)
-
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
+class PegiDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Pegi.objects.all()
+    serializer_class = PegiSerializer
+    name = 'pegi-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-# ------------------------------Category
-class CategoryList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Category.objects.all()
-        serializer_class = CategorySerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = CategorySerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CategoryDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = CategorySerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = CategorySerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class CategoryCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = 'pk'
+    name = 'category-list'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(ownerCategory=self.request.user)
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
-
-    def post(self, request):
-        return self.create(request)
-
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
-
-# ------------------------------Translation
-class TranslationList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Translation.objects.all()
-        serializer_class = TranslationSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = TranslationSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class TranslationDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Translation.objects.get(pk=pk)
-        except Translation.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = TranslationSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = TranslationSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class TranslationCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
-    queryset = Translation.objects.all()
-    serializer_class = TranslationSerializer
-    lookup_field = 'pk'
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    name = 'category-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+class TransalationList(generics.ListCreateAPIView):
+    queryset = Transalation.objects.all()
+    serializer_class = TransalationSerializer
+    name = 'transalation-list'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
+class TransalationDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Transalation.objects.all()
+    serializer_class = TransalationSerializer
+    name = 'translation-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
 
-# ------------------------------Cinema_hall
-class CinemaHallList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Cinema_hall.objects.all()
-        serializer_class = CinemaHallSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = CinemaHallSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CinemaHallLDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Cinema_hall.objects.get(pk=pk)
-        except Cinema_hall.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = CinemaHallSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = CinemaHallSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class CinemaHallCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class CinemaHallList(generics.ListCreateAPIView):
     queryset = Cinema_hall.objects.all()
     serializer_class = CinemaHallSerializer
-    lookup_field = 'pk'
+    name = 'cinemahall-list'
+    permission_classes = [permissions.IsAuthenticated]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+class CinemaHallDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cinema_hall.objects.all()
+    serializer_class = CinemaHallSerializer
+    name = 'cinemahall-detail'
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
-
-# ------------------------------Film
-class FilmList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Film.objects.all()
-        serializer_class = FilmSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = FilmSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class FilmDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Film.objects.get(pk=pk)
-        except Film.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = FilmSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = FilmSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class FilmCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class FilmList(generics.ListCreateAPIView):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
-    lookup_field = 'pk'
+    name = 'film-list'
+    filter_fields = ['id_film', 'id_category', 'id_pegi']
+    search_fields = ['title']
+    ordering_fields = ['id_film']
+    permission_classes = [permissions.IsAuthenticated]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+class FilmDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Film.objects.all()
+    serializer_class = FilmSerializer
+    name = 'film-detail'
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
-
-# ------------------------------Seats
-class SeatsList(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Seats.objects.all()
-        serializer_class = SeatsSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = SeatsSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class SeatsDetail(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Seats.objects.get(pk=pk)
-        except Seats.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = SeatsSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = SeatsSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class SeatsCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class SeatsList(generics.ListCreateAPIView):
+    minAge = NumberFilter(field_name='age_range', lookup_expr='gte')
+    maxAge = NumberFilter(field_name='age_range', lookup_expr='lte')
     queryset = Seats.objects.all()
     serializer_class = SeatsSerializer
-    lookup_field = 'pk'
+    name = 'seats-list'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
+class SeatsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Seats.objects.all()
+    serializer_class = SeatsSerializer
+    name = 'seats-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def post(self, request):
-        return self.create(request)
 
-    def put(self, request, pk = None):
-        return self.update(request, pk)
+class FilmShowsListFilter(FilterSet):
+    fromDate = DateTimeFilter(field_name='date', lookup_expr='gte')
+    toDate = DateTimeFilter(field_name='date', lookup_expr='lte')
 
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
+    class meta:
+        model = Film_shows
+        fields = ['fromDate', 'toDate']
 
-# ------------------------------Film_shows
-class FilmShowsList(APIView):
 
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Film_shows.objects.all()
-        serializer_class = FilmShowsSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = FilmShowsSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class FilmShowsDetail(APIView):
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get_object(self, pk):
-        try:
-            return Film_shows.objects.get(pk=pk)
-        except Film_shows.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = FilmShowsSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = FilmShowsSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class FilmShowsCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
+class FilmShowsList(generics.ListCreateAPIView):
     queryset = Film_shows.objects.all()
     serializer_class = FilmShowsSerializer
-    lookup_field = 'pk'
-
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
-
-    def post(self, request):
-        return self.create(request)
-
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
-
-# ------------------------------Give_me_seat
-class GiveMeSeatList(APIView):
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
-
-    def get(self, request, format=None):
-        modele = Give_me_seat.objects.all()
-        serializer_class = GiveMeSeatSerializer(modele, many=True)
-        return Response(serializer_class.data)
-
-    def post(self, request, format=None):
-        serializer_class = GiveMeSeatSerializer(data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class GiveMeSeatDetail(APIView):
+    name = 'filmshows-list'
+    filter_class = FilmShowsListFilter
+    ordering_fields = ['id_film_shows', 'id_film', 'id_CinemaHall']
+    search_fields = ['id_film', 'id_CinemaHall']
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-    def get(self, request, format=None):
-        content = {
-            'status': 'Musisz być zalogowany'
-        }
-        return Response(content)
+class FilmShowsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Film_shows.objects.all()
+    serializer_class = FilmShowsSerializer
+    name = 'filmshows-detail'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_object(self, pk):
-        try:
-            return Give_me_seat.objects.get(pk=pk)
-        except Give_me_seat.DoesNotExist:
-            raise Http404
 
-    def get(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = GiveMeSeatSerializer(modele)
-        return Response(serializer_class.data)
-
-    def put(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        serializer_class = GiveMeSeatSerializer(modele, data=request.data)
-        if serializer_class.is_valid():
-            serializer_class.save()
-            return Response(serializer_class.data)
-        return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        modele = self.get_object(pk)
-        modele.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class GiveMeSeatCreate(generics.ListCreateAPIView,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin):
-    permission_classes = [IsAdminUser]
+class GiveMeSeatList(generics.ListCreateAPIView):
     queryset = Give_me_seat.objects.all()
     serializer_class = GiveMeSeatSerializer
-    lookup_field = 'pk'
+    name = 'reservation-list'
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, pk=None):
-        if pk:
-            return self.retrieve(request, pk)
-        else:
-            return self.list(request)
 
-    def post(self, request):
-        return self.create(request)
-
-    def put(self, request, pk = None):
-        return self.update(request, pk)
-
-    def delete(self, request, pk = None):
-        return self.destroy(request, pk)
+class GiveMeSeatDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Give_me_seat.objects.all()
+    serializer_class = GiveMeSeatSerializer
+    name = 'reservation-detail'
+    permission_classes = [permissions.IsAuthenticated]
