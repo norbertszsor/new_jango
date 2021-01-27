@@ -1,16 +1,21 @@
 from django.http import Http404, HttpResponse
 from rest_framework.response import Response
 from rest_framework import generics, mixins
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import *
-
+from .filters import *
 
 def homePage(request):
     return HttpResponse('HomePage')
 
 # ------------------------------USER
+
+def product_list(request):
+    f = UserFilter(request.GET, queryset=User.objects.all())
+    return render(request, 'templates/form.html', {'filter': f})
 
 class UserList(APIView):
 
@@ -25,6 +30,10 @@ class UserList(APIView):
             serializer_class.save()
             return Response(serializer_class.data, status=status.HTTP_201_CREATED)
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = UserFilter(self.request.GET, querysetset = self.get_queryset())
 
 class UserDetail(APIView):
     permission_classes = [IsAdminUser]
@@ -68,7 +77,9 @@ class UserCreate(generics.ListCreateAPIView,
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'pk'
-
+    filter_fields = ['user_name', 'password']
+    search_fields = ['user_name']
+    ordering_fields = ['user_name']
 
     def get(self, request, pk=None):
         if pk:
@@ -79,14 +90,8 @@ class UserCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -166,14 +171,8 @@ class TicketOptionsCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -253,14 +252,8 @@ class PegiCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -341,14 +334,8 @@ class CategoryCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -428,14 +415,8 @@ class TranslationCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -515,14 +496,8 @@ class CinemaHallCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -602,14 +577,8 @@ class FilmCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -689,14 +658,8 @@ class SeatsCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -773,14 +736,8 @@ class FilmShowsCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)
@@ -859,14 +816,8 @@ class GiveMeSeatCreate(generics.ListCreateAPIView,
     def post(self, request):
         return self.create(request)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by = self.request.user)
-
     def put(self, request, pk = None):
         return self.update(request, pk)
-
-    def perform_update(self, serializer):
-        serializer.save(created_by = self.request.user)
 
     def delete(self, request, pk = None):
         return self.destroy(request, pk)

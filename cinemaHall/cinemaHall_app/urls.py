@@ -10,6 +10,8 @@ urlpatterns = [
     path(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
+    path('TEST/', views.product_list),
+
     path('users/', views.UserList.as_view()),
     path('users/<int:id>/', views.UserDetail.as_view()),
     path('users/create', views.UserCreate.as_view()),
@@ -19,7 +21,6 @@ urlpatterns = [
     path('tickets/<int:pk>/', views.TicketOptionsDetail.as_view()),
     path('tickets/create', views.TicketOptionsCreate.as_view()),
     path('tickets/create/<int:pk>/', views.TicketOptionsCreate.as_view()),
-
 
     path('pegi/', views.PegiList.as_view()),
     path('pegi/<int:pk>/', views.PegiDetail.as_view()),
