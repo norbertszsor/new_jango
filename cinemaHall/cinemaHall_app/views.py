@@ -37,7 +37,7 @@ class UserCinemaList(generics.ListCreateAPIView):
     filter_fields = ['user_name', 'email', 'age']
     search_fields = ['user_name']
     ordering_fields = ['id_user', 'user_name', 'age']
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
 
     def perform_create(self, serializer):
         serializer.save(ownerUser=self.request.user)
@@ -47,7 +47,7 @@ class UserCinemaDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserCinema.objects.all()
     serializer_class = UserCinemaSerializer
     name = 'usercinema-detail'
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
 
 
 class TicketList(generics.ListCreateAPIView):
@@ -74,6 +74,7 @@ class PegiListFilter(FilterSet):
     class meta:
         model = Pegi
         fields = ['minAge', 'maxAge']
+
 
 
 class PegiList(generics.ListCreateAPIView):
@@ -126,14 +127,14 @@ class CinemaHallList(generics.ListCreateAPIView):
     queryset = Cinema_hall.objects.all()
     serializer_class = CinemaHallSerializer
     name = 'cinemahall-list'
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class CinemaHallDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cinema_hall.objects.all()
     serializer_class = CinemaHallSerializer
     name = 'cinemahall-detail'
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class FilmList(generics.ListCreateAPIView):
@@ -143,14 +144,14 @@ class FilmList(generics.ListCreateAPIView):
     filter_fields = ['id_film', 'id_category', 'id_pegi']
     search_fields = ['title']
     ordering_fields = ['id_film']
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class FilmDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
     name = 'film-detail'
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class SeatsList(generics.ListCreateAPIView):
