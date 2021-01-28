@@ -11,8 +11,8 @@ from .serializers import *
 from .models import *
 
 
-class AdminMenu(generics.GenericAPIView):
-    name = 'Admin-Menu'
+class Menu(generics.GenericAPIView):
+    name = 'api-root'
 
     def get(self, request):
         return Response({
@@ -37,7 +37,7 @@ class UserCinemaList(generics.ListCreateAPIView):
     filterset_fields = ['user_name', 'email', 'age']
     search_fields = ['user_name']
     ordering_fields = ['id_user', 'user_name', 'age']
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(ownerUser=self.request.user)
@@ -47,7 +47,7 @@ class UserCinemaDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserCinema.objects.all()
     serializer_class = UserCinemaSerializer
     name = 'usercinema-detail'
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class TicketList(generics.ListCreateAPIView):

@@ -93,4 +93,4 @@ class Give_me_seat(BaseModel):
     id_user = models.ForeignKey(UserCinema, on_delete=models.CASCADE, related_name='reservation')
 
     def __str__(self):
-        return self.id_give_me_seat
+        return str(self.id_give_me_seat)

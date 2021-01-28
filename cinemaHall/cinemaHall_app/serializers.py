@@ -92,7 +92,7 @@ class FilmShowsSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GiveMeSeatSerializer(serializers.HyperlinkedModelSerializer):
-    id_seat = serializers.SlugRelatedField(queryset=Seats.objects.all(), slug_field='its_fill')
+    id_seat = serializers.SlugRelatedField(queryset=Seats.objects.all(), slug_field='id_seat')
     id_user = serializers.SlugRelatedField(queryset=UserCinema.objects.all(), slug_field='user_name')
     id_ticket_options = serializers.SlugRelatedField(queryset=Ticket_options.objects.all(), slug_field='name_ticket')
 
