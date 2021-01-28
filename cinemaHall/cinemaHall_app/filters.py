@@ -3,5 +3,5 @@ from .models import *
 
 class UserFilter(FilterSet):
     class Meta:
-        model = User
+        model = UserCinema
         fields = ['id_user', 'user_name', 'password', 'email', 'age']
